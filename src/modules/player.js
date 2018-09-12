@@ -1,12 +1,14 @@
 import {getFrequency} from '../utils/getFrequency.js';
-import {Kick, HiHat, Snare} from './drums.js';
+import chords from './chords.js';
+import {Kick, HiHat, Snare, Bass} from './drums.js';
 
 class Player {
     constructor() {
         console.log('welcome to la playa');
         this.drumsInterval = null;
         this.oscillators = [];
-        this.audio = new AudioContext()
+        this.audio = new AudioContext();
+        this.chord = '';
 
         this.addEventListeners();
     }
@@ -43,15 +45,25 @@ class Player {
             this.kick();
             setTimeout(()=>{
                 this.hihat();
+                this.playChord(0);
             }, tempo / 4);
             setTimeout(()=>{
                 this.hihat();
                 this.snare();
+                this.playChord(1);
             }, tempo / 2);
             setTimeout(()=>{
                 this.hihat();
+                this.playChord(2);
             }, tempo / 4 * 3);
-        },tempo);
+        }, tempo);
+    }
+
+    playChord(index) {
+        if (this.chord) {
+            const chordToPlay = chords.filter(chord => chord.chord === this.chord)[0];
+            this.bass(chordToPlay.freqs[index]);
+        }
     }
 
     stopDrums() {
@@ -97,6 +109,9 @@ class Player {
             this.snare();
         } else if (frequency === 2) {
             this.hihat();
+        } else if (frequency === 'c' || frequency === 'f' || frequency === 'd' ||
+         frequency === 'g' || frequency === 'e' || frequency === 'a' || frequency === 'b') {
+            this.chord = frequency;
         } else if (!existingOscillator) {
             this.play(frequency);
         }
@@ -122,6 +137,11 @@ class Player {
     hihat() {
         const hiHat = new HiHat(this.audio);
         hiHat.trigger(this.audio.currentTime);
+    }
+
+    bass(note) {
+        const bass = new Bass(this.audio);
+        bass.trigger(this.audio.currentTime, note);
     }
 
     addEventListeners() {

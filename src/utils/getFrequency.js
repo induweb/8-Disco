@@ -28,14 +28,35 @@ export function getFrequency(keyName) {
         case 'l':
             freq = 2217;
             break;
-        case 'm':
+        case '8':
             freq = 1;
             break;
-        case 'n':
+        case '9':
             freq = 2;
             break;
-        case 'b':
+        case '0':
             freq = 3;
+            break;
+        case 'z':
+            freq = 'c';
+            break;
+        case 'x':
+            freq = 'd';
+            break;
+        case 'c':
+            freq = 'e';
+            break;
+        case 'v':
+            freq = 'f';
+            break;
+        case 'b':
+            freq = 'g';
+            break;
+        case 'n':
+            freq = 'a';
+            break;
+        case 'm':
+            freq = 'b';
             break;
     }
 

@@ -148,5 +148,78 @@ class Snare {
         this.gain.gain.exponentialRampToValueAtTime(0.00001, time + 0.3);
       };
   };
+
+  class Bass {
+    constructor(context) {
+          this.context = context;
+          this.gain = context.createGain();
+      }
   
-export {Kick, Snare, HiHat};
+      note2freq(note) {
+        console.log(Math.pow(2, (note - 69) / 12) * 440)
+          return Math.pow(2, (note - 69) / 12) * 440;
+      }
+  
+      setup() {
+          this.osc1 = this.context.createOscillator();
+          this.osc2 = this.context.createOscillator();
+          this.filter = this.context.createBiquadFilter();
+
+          this.osc1.connect(this.filter).connect(this.gain).connect(this.context.destination);
+          this.osc2.connect(this.filter);
+
+          // this.enveloppe = this.context.createGain();
+          // this.volume = this.context.createGain();
+          // this.lowpass = this.context.createBiquadFilter();
+        
+          // var note= 36;
+          // this.osc1.frequency.value = this.osc2.frequency.value = this.note2freq(note);
+          // this.osc1.type = this.osc2.type = "sawtooth";
+        
+          // this.osc2.detune.value = 30;
+        
+          // this.lowpass.type = "lowpass";
+          // this.lowpass.Q.value = 25;
+      };
+      
+      trigger(t, note) {
+          this.setup();
+var FREQ = 5000;
+          this.osc1.frequency.setValueAtTime(note, t);
+          this.osc2.frequency.setValueAtTime(note, t);
+          this.osc2.detune.value = 20;
+          this.osc1.type = "sawtooth";
+          this.osc2.type = "sawtooth";
+          this.gain.gain.setValueAtTime(0.3, t);
+          this.gain.gain.setTargetAtTime(0.0, t, 0.1);
+          this.filter.Q.setValueAtTime(20, t);
+          this.filter.frequency.setValueAtTime(300, t);
+          this.filter.frequency.setTargetAtTime(FREQ, t, 0.01);
+          this.filter.type = "lowpass";
+          this.osc1.start(t);
+          this.osc2.start(t);
+          this.osc1.stop(t+1);
+          this.osc2.stop(t+1);
+          
+          // this.enveloppe.gain.setValueAtTime(1.0, t);
+          // this.enveloppe.gain.setTargetAtTime(0.0, t, 0.1);
+        
+          // this.lowpass.frequency.setValueAtTime(300, t);
+          // this.lowpass.frequency.setTargetAtTime(1000, t, 0.1);
+        
+          // this.volume.gain.value = 0.3;
+        
+          // this.osc1.connect(this.enveloppe);
+          // this. osc2.connect(this.enveloppe);
+          // this.enveloppe.connect(this.lowpass);
+          // this.lowpass.connect(this.volume);
+          // this.volume.connect(this.context.destination);
+        
+          // this.osc1.start(t);
+          // this.osc1.stop(t + 1);
+          // this.osc2.start(t);
+          // this.osc2.stop(t + 1);
+      };
+  };
+  
+export {Kick, Snare, HiHat, Bass};
