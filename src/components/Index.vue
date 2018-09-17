@@ -2,7 +2,18 @@
   <div>
     <h1>8-Disco</h1>
     <h2>8-bit Disco Polo Player</h2>
-    <input type="number" min="50" max="150" v-model="tempo" :disabled="drumsPlaying">
+    <div>
+      <label for="#">Tempo: </label>
+      <input type="number" min="50" max="150" v-model="tempo" :disabled="drumsPlaying">
+    </div>
+    <div>
+      <label for="#">Melody VOLUME: </label>
+      <input type="range" min="0" max="10" v-model="melodyVolume" v-on:change="melodyVolumeChange">
+    </div>
+    <div>
+      <label for="#">BASS FREQ: </label>
+      <input type="range" min="1000" max="10000" v-model="bassFreq" v-on:change="bassFreqChange">
+    </div>
     <button v-on:click="playDrums" v-show="!drumsPlaying">Play drums</button>
     <button v-on:click="stopDrums" v-show="drumsPlaying">Stop drums</button>
     <img src="../assets/bg.png" alt="">
@@ -22,6 +33,8 @@ export default {
     return {
       player: null,
       tempo: 100,
+      melodyVolume: 2,
+      bassFreq: 5000,
       drumsPlaying: false
     }
   },
@@ -36,6 +49,12 @@ export default {
     stopDrums() {
       this.player.stopDrums();
       this.drumsPlaying = false;
+    },
+    bassFreqChange() {
+      this.player.setBassFreq(this.bassFreq);
+    },
+    melodyVolumeChange() {
+      this.player.setMelodyVolume(this.melodyVolume);
     }
   }
 };

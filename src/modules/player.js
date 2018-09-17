@@ -9,6 +9,8 @@ class Player {
         this.oscillators = [];
         this.audio = new AudioContext();
         this.chord = '';
+        this.bassFreq = 5000;
+        this.melodyVolume = 0.2;
 
         this.addEventListeners();
     }
@@ -38,17 +40,25 @@ class Player {
         this.oscillators.splice(currentOscillatorIndex, 1);
     }
 
+    setBassFreq(freq) {
+        this.bassFreq = freq;
+    }
+
+    setMelodyVolume(vol) {
+        this.melodyVolume = parseFloat(vol / 10);
+    }
+
     playDrums(t){
         const tempo = t * 10;
         this.drumsInterval = setInterval(() => {
-            this.hihat();
+            // this.hihat();
             this.kick();
             setTimeout(()=>{
                 this.hihat();
                 this.playChord(0);
             }, tempo / 4);
             setTimeout(()=>{
-                this.hihat();
+                // this.hihat();
                 this.snare();
                 this.playChord(1);
             }, tempo / 2);
@@ -74,6 +84,7 @@ class Player {
         const gain = this.audio.createGain();//can be moved up?
         const osc = this.audio.createOscillator();
         const osc2 = this.audio.createOscillator();
+        gain.gain.setValueAtTime(this.melodyVolume, this.audio.currentTime);
 
         gain.connect(this.audio.destination);
 
@@ -109,8 +120,8 @@ class Player {
             this.snare();
         } else if (frequency === 2) {
             this.hihat();
-        } else if (frequency === 'c' || frequency === 'f' || frequency === 'd' ||
-         frequency === 'g' || frequency === 'e' || frequency === 'a' || frequency === 'b') {
+        } else if (frequency === 'c' || frequency === 'f' || frequency === 'd' || frequency === 'g' ||
+        frequency === 'e' || frequency === 'a' || frequency === 'b') {
             this.chord = frequency;
         } else if (!existingOscillator) {
             this.play(frequency);
@@ -141,7 +152,7 @@ class Player {
 
     bass(note) {
         const bass = new Bass(this.audio);
-        bass.trigger(this.audio.currentTime, note);
+        bass.trigger(this.audio.currentTime, note, this.bassFreq);
     }
 
     addEventListeners() {

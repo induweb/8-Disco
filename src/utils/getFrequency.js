@@ -1,5 +1,6 @@
 export function getFrequency(keyName) {
     let freq = 0;
+    console.log(keyName);
     switch(keyName) {
         case 'a': 
             freq = 1047;
@@ -26,7 +27,19 @@ export function getFrequency(keyName) {
             freq = 2093;
             break;
         case 'l':
-            freq = 2217;
+            freq = 2349;
+            break;
+        case ';':
+            freq = 2637;
+            break;
+        case `'`:
+            freq = 2794;
+            break;
+        case '\\':
+            freq = 3136;
+            break;
+        case 'Enter':
+            freq = 3520;
             break;
         case '8':
             freq = 1;
