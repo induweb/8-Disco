@@ -27,7 +27,7 @@
 
 import {getFrequency} from '../utils/getFrequency.js';
 import chords from '../modules/chords.js';
-import {Kick, HiHat, Snare, Bass} from '../modules/drums.js';
+import {Accordion, Kick, HiHat, Snare, Bass} from '../modules/instruments.js';
 
 export default {
   name: 'Index',
@@ -39,23 +39,30 @@ export default {
       drumsPlaying: false,
       drumsInterval: null,
       oscillators: [],
+      accordion: null,
+      kick: null,
+      hiHat: null,
+      snare: null,
+      bass: null,
       audio: new AudioContext(),
       chord: '',
     }
   },
   mounted() {
-    this.addEventListeners();
+        this.accordion = new Accordion(this.audio);
+        this.kick = new Kick(this.audio);
+        this.hiHat = new HiHat(this.audio);
+        this.snare = new Snare(this.audio);
+        this.bass = new Bass(this.audio);
+        this.addEventListeners();
   },
   methods: {
-    play(frequency) {
-        this.createOscillator(frequency);
+    playMelody(frequency) {
+        const note = this.accordion.play(frequency, this.melodyVolume);
+        this.oscillators.push(note);
     },
 
-    stop(frequency) {
-        if (frequency===1 || frequency === 2 || frequency === 3) {
-            return;
-        }
-
+    stopMelody(frequency) {
         let currentOscillatorIndex = null;
         const currentOscillator = this.oscillators.filter((oscillator, index) => {
             if(oscillator.freq === frequency) {
@@ -71,26 +78,23 @@ export default {
         }
 
         this.oscillators.splice(currentOscillatorIndex, 1);
-        console.log(this.oscillators);
     },
 
     playDrums(){
         this.drumsPlaying = true;
         const tempo = (200 - parseInt(this.tempo)) * 10;
         this.drumsInterval = setInterval(() => {
-            // this.hihat();
-            this.kick();
+            this.playKick();
             setTimeout(()=>{
-                this.hihat();
+                this.playHiHat();
                 this.playChord(0);
             }, tempo / 4);
             setTimeout(()=>{
-                // this.hihat();
-                this.snare();
+                this.playSnare();
                 this.playChord(1);
             }, tempo / 2);
             setTimeout(()=>{
-                this.hihat();
+                this.playHiHat();
                 this.playChord(2);
             }, tempo / 4 * 3);
         }, tempo);
@@ -99,41 +103,13 @@ export default {
     playChord(index) {
         if (this.chord) {
             const chordToPlay = chords.filter(chord => chord.chord === this.chord)[0];
-            this.bass(chordToPlay.freqs[index]);
+            this.playBass(chordToPlay.freqs[index]);
         }
     },
 
     stopDrums() {
         clearInterval(this.drumsInterval);
         this.drumsPlaying = false;
-    },
-
-    createOscillator(freq) {
-        const gain = this.audio.createGain();//can be moved up?
-        const osc = this.audio.createOscillator();
-        const osc2 = this.audio.createOscillator();
-        gain.gain.setValueAtTime(this.melodyVolume, this.audio.currentTime);
-
-        gain.connect(this.audio.destination);
-
-        osc.frequency.value = freq;
-        osc.type = "sawtooth";
-        osc.detune.value = -10;
-
-        osc2.frequency.value = freq;
-        osc2.type = 'triangle';
-        osc2.detune.value = 10;
-
-        osc.connect(gain);
-        osc2.connect(gain);
-
-        this.oscillators.push({
-            freq,
-            oscillators: [osc, osc2]
-        });
-
-        osc.start(this.audio.currentTime);
-        osc2.start(this.audio.currentTime);
     },
 
     keydownHandler(e) {
@@ -143,43 +119,41 @@ export default {
             .filter((oscillator) => oscillator.freq === frequency)[0];
         
         if (frequency === 1) {
-            this.kick();
+            this.playKick();
         } else if (frequency === 3) {
-            this.snare();
+            this.playSnare();
         } else if (frequency === 2) {
-            this.hihat();
+            this.playHiHat();
         } else if (frequency === 'c' || frequency === 'f' || frequency === 'd' || frequency === 'g' ||
         frequency === 'e' || frequency === 'a' || frequency === 'b') {
             this.chord = frequency;
         } else if (!existingOscillator) {
-            this.play(frequency);
+            this.playMelody(frequency);
         }
     },
 
     keyupHandler(e) {
         const keyName = e.key;
         const frequency = getFrequency(keyName);
-        this.stop(frequency);
+        if(typeof frequency == 'number' && frequency > 3) {
+            this.stopMelody(frequency);
+        }
     },
 
-    kick() {
-        const kick = new Kick(this.audio);
-        kick.trigger(this.audio.currentTime);
+    playKick() {
+        this.kick.play(this.audio.currentTime);
     },
 
-    snare(){
-        const snare = new Snare(this.audio);
-        snare.trigger(this.audio.currentTime);
+    playSnare(){
+        this.snare.play(this.audio.currentTime);
     },
 
-    hihat() {
-        const hiHat = new HiHat(this.audio);
-        hiHat.trigger(this.audio.currentTime);
+    playHiHat() {
+        this.hiHat.play(this.audio.currentTime);
     },
 
-    bass(note) {
-        const bass = new Bass(this.audio);
-        bass.trigger(this.audio.currentTime, note, this.bassFreq);
+    playBass(note) {
+        this.bass.play(this.audio.currentTime, note, this.bassFreq);
     },
 
     addEventListeners() {

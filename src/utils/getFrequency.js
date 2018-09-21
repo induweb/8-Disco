@@ -1,7 +1,7 @@
 export function getFrequency(keyName) {
     let freq = 0;
-    console.log(keyName);
-    switch(keyName) {
+    // console.log(keyName);
+    switch(keyName.toLowerCase()) {
         case 'a': 
             freq = 1047;
             break;
@@ -38,7 +38,7 @@ export function getFrequency(keyName) {
         case '\\':
             freq = 3136;
             break;
-        case 'Enter':
+        case 'enter':
             freq = 3520;
             break;
         case '8':
