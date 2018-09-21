@@ -25,9 +25,8 @@
 
 <script>
 
-import {getFrequency} from '../utils/getFrequency.js';
-import chords from '../modules/chords.js';
-import {Accordion, Kick, HiHat, Snare, Bass} from '../modules/instruments.js';
+import { frequencies } from '../modules/frequencies.js';
+import { Accordion, Kick, HiHat, Snare, Bass } from '../modules/instruments.js';
 
 export default {
   name: 'Index',
@@ -64,12 +63,12 @@ export default {
 
     stopMelody(frequency) {
         let currentOscillatorIndex = null;
-        const currentOscillator = this.oscillators.filter((oscillator, index) => {
+        const currentOscillator = this.oscillators.find((oscillator, index) => {
             if(oscillator.freq === frequency) {
                 currentOscillatorIndex = index;
                 return oscillator;
             }
-        })[0];
+        });
 
         if(currentOscillator) {
             currentOscillator.oscillators.forEach(oscillator => {
@@ -90,6 +89,7 @@ export default {
                 this.playChord(0);
             }, tempo / 4);
             setTimeout(()=>{
+                this.playKick();
                 this.playSnare();
                 this.playChord(1);
             }, tempo / 2);
@@ -100,43 +100,14 @@ export default {
         }, tempo);
     },
 
-    playChord(index) {
-        if (this.chord) {
-            const chordToPlay = chords.filter(chord => chord.chord === this.chord)[0];
-            this.playBass(chordToPlay.freqs[index]);
-        }
-    },
-
     stopDrums() {
         clearInterval(this.drumsInterval);
         this.drumsPlaying = false;
     },
 
-    keydownHandler(e) {
-        const keyName = e.key;
-        const frequency = getFrequency(keyName);
-        const existingOscillator = this.oscillators
-            .filter((oscillator) => oscillator.freq === frequency)[0];
-        
-        if (frequency === 1) {
-            this.playKick();
-        } else if (frequency === 3) {
-            this.playSnare();
-        } else if (frequency === 2) {
-            this.playHiHat();
-        } else if (frequency === 'c' || frequency === 'f' || frequency === 'd' || frequency === 'g' ||
-        frequency === 'e' || frequency === 'a' || frequency === 'b') {
-            this.chord = frequency;
-        } else if (!existingOscillator) {
-            this.playMelody(frequency);
-        }
-    },
-
-    keyupHandler(e) {
-        const keyName = e.key;
-        const frequency = getFrequency(keyName);
-        if(typeof frequency == 'number' && frequency > 3) {
-            this.stopMelody(frequency);
+    playChord(index) {
+        if (this.chord) {
+            this.playBass(this.chord[index]);
         }
     },
 
@@ -154,6 +125,53 @@ export default {
 
     playBass(note) {
         this.bass.play(this.audio.currentTime, note, this.bassFreq);
+    },
+    
+    keydownHandler(e) {
+        const frequency = this.getFrequency(e.key);
+
+        if(!frequency) {
+            return false;
+        }
+
+        const existingOscillator = this.oscillators
+            .find((oscillator) => oscillator.freq === frequency.value);
+        
+        if (frequency.type === 'melody' && !existingOscillator){
+            this.playMelody(frequency.value);
+        }
+
+        if (frequency.type === 'drum'){
+            if (frequency.value === 'kick') {
+                this.playKick();
+            } else if (frequency.value === 'snare') {
+                this.playSnare();
+            } else if (frequency.value === 'hiHat') {
+                this.playHiHat();
+            }
+        }
+
+        if (frequency.type === 'chord') {
+            this.chord = frequency.value;
+        }
+    },
+
+    keyupHandler(e) {
+        const frequency = this.getFrequency(e.key);
+
+        if(!frequency) {
+            return false;
+        }
+
+        if (frequency.type === 'melody') {
+            this.stopMelody(frequency.value);
+        }
+    },
+
+    getFrequency(key) {
+        return frequencies.find(freq => {
+            return key === freq.key
+        });
     },
 
     addEventListeners() {
@@ -188,7 +206,6 @@ img {
 a{
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   color: #fff;
-  // letter-spacing: 1px;
   text-shadow: 0 12px 20px rgba(20,18,21,.2);
 }
 
