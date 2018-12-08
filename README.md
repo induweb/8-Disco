@@ -2,7 +2,7 @@
 
 ## DEMO
 ```
-[https://induweb.github.io/8-Disco/dist/]
+[https://induweb.github.io/8-Disco/dist/](https://induweb.github.io/8-Disco/dist/)
 ```
 ## Info
 ```
