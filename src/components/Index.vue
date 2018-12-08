@@ -9,6 +9,7 @@
            <p>You can play music on your keyboard:</p>
            <p><strong>Melody</strong> - keys (asdfghjkl;')</p>
            <p><strong>Chords</strong> - keys (zxcvbnm) - only with drums</p>
+           <p>Made with Vue.js and NES.css</p>
            <p>
                <a href="https://web.facebook.com/indu.frontend/" target="_blank"><i class="icon facebook is-large"></i></a>
                <a href="https://github.com/induweb/" target="_blank"><i class="icon github is-large"></i></a>
@@ -16,29 +17,10 @@
         </div>
     </section>
 
-    <section v-if="drumsPlaying && chord.length">
-        <div class="message -right">
-          <div class="balloon from-right">
-            <p>Playing chord: {{chordName}}</p>
-          </div>
-          <i class="bcrikko"></i>
-        </div>
-    </section>
-
-    <section class="container with-title">
-        <h2 class="title">Music type</h2>
-        <div>
-            <label>
-                <input type="radio" class="radio" name="type" checked="">
-                <span>8-BIT</span>
-            </label>
-            <label>
-                <input type="radio" class="radio" name="type">
-                <span>Normal</span>
-            </label>
-        </div>
-    </section>
-
+    <button class="btn" v-on:click="playDrums" v-show="!drumsPlaying">Play drums</button>
+    <button class="btn" v-on:click="stopDrums" v-show="drumsPlaying">Stop drums</button>
+    <button class="btn" v-on:click="stopChord" v-show="drumsPlaying && chord.length">Stop chords</button>
+    
     <section class="form container with-title">
         <h2 class="title">Options</h2>
         <div class="field is-inline">
@@ -55,9 +37,29 @@
         </div>
     </section>
 
-    <button class="btn" v-on:click="playDrums" v-show="!drumsPlaying">Play drums</button>
-    <button class="btn" v-on:click="stopDrums" v-show="drumsPlaying">Stop drums</button>
-    <button class="btn" v-on:click="stopChord" v-show="drumsPlaying && chord.length">Stop chords</button>
+    <section v-if="drumsPlaying && chord.length">
+        <div class="message -right">
+          <div class="balloon from-right">
+            <p>Playing chord: {{chordName}}</p>
+          </div>
+          <i class="bcrikko"></i>
+        </div>
+    </section>
+
+    <section class="container with-title">
+        <h2 class="title">Music type (not yet)</h2>
+        <div>
+            <label>
+                <input type="radio" class="radio" name="type" checked="">
+                <span>8-BIT</span>
+            </label>
+            <label>
+                <input type="radio" class="radio" name="type">
+                <span>Normal</span>
+            </label>
+        </div>
+    </section>
+
     <p>
       <a class="footer-link" href="http://www.induweb.pl">induweb.pl</a>
     </p>
@@ -262,5 +264,9 @@ export default {
     z-index: 9999;
     display: flex;
     align-items: flex-end;
+}
+
+button {
+    margin-bottom: 30px;
 }
 </style>
