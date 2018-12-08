@@ -8,6 +8,7 @@
            <p>This project presents the power of Web Audio API. No sound files, just a few oscillators.</p>
            <p>You can play music on your keyboard:</p>
            <p><strong>Melody</strong> - keys (asdfghjkl;')</p>
+           <p><strong>Drums</strong> - keys (890)</p>
            <p><strong>Chords</strong> - keys (zxcvbnm) - only with drums</p>
            <p>Made with Vue.js and NES.css</p>
            <p>
