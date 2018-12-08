@@ -5,8 +5,23 @@
     <section class="container with-title">
         <h2 class="title">Hello</h2>
         <div>
-           <p>This project shows Web Audio API futures.</p>
-           <p>Share</p>
+           <p>This project presents the power of Web Audio API. No sound files, just a few oscillators.</p>
+           <p>You can play music on your keyboard:</p>
+           <p><strong>Melody</strong> - keys (asdfghjkl;')</p>
+           <p><strong>Chords</strong> - keys (zxcvbnm) - only with drums</p>
+           <p>
+               <a href="https://web.facebook.com/indu.frontend/" target="_blank"><i class="icon facebook is-large"></i></a>
+               <a href="https://github.com/induweb/" target="_blank"><i class="icon github is-large"></i></a>
+           </p>
+        </div>
+    </section>
+
+    <section v-if="drumsPlaying && chord.length">
+        <div class="message -right">
+          <div class="balloon from-right">
+            <p>Playing chord: {{chordName}}</p>
+          </div>
+          <i class="bcrikko"></i>
         </div>
     </section>
 
@@ -40,11 +55,11 @@
         </div>
     </section>
 
-    <button class="btn" v-on:click="playDrums" v-show="!drumsPlaying">Play chords</button>
-    <button class="btn" v-on:click="stopDrums" v-show="drumsPlaying">Stop chords</button>
-    <!-- <img src="../assets/bg.png" alt=""> -->
+    <button class="btn" v-on:click="playDrums" v-show="!drumsPlaying">Play drums</button>
+    <button class="btn" v-on:click="stopDrums" v-show="drumsPlaying">Stop drums</button>
+    <button class="btn" v-on:click="stopChord" v-show="drumsPlaying && chord.length">Stop chords</button>
     <p>
-      <a href="http://www.induweb.pl">induweb.pl</a>
+      <a class="footer-link" href="http://www.induweb.pl">induweb.pl</a>
     </p>
   </div>
 </template>
@@ -70,7 +85,8 @@ export default {
       snare: null,
       bass: null,
       audio: new AudioContext(),
-      chord: '',
+      chord: [],
+      chordName: ''
     }
   },
   mounted() {
@@ -110,6 +126,7 @@ export default {
         const tempo = (200 - parseInt(this.tempo)) * 10;
         this.drumsInterval = setInterval(() => {
             this.playKick();
+            this.playChord(1);  
             setTimeout(()=>{
                 this.playHiHat();
                 this.playChord(0);
@@ -132,9 +149,13 @@ export default {
     },
 
     playChord(index) {
-        if (this.chord) {
+        if (this.chord.length) {
             this.playBass(this.chord[index]);
         }
+    },
+
+    stopChord() {
+        this.chord = [];
     },
 
     playKick() {
@@ -160,25 +181,28 @@ export default {
             return false;
         }
 
-        const existingOscillator = this.oscillators
-            .find((oscillator) => oscillator.freq === frequency.value);
-        
-        if (frequency.type === 'melody' && !existingOscillator){
-            this.playMelody(frequency.value);
-        }
-
-        if (frequency.type === 'drum'){
-            if (frequency.value === 'kick') {
-                this.playKick();
-            } else if (frequency.value === 'snare') {
-                this.playSnare();
-            } else if (frequency.value === 'hiHat') {
-                this.playHiHat();
-            }
-        }
-
-        if (frequency.type === 'chord') {
-            this.chord = frequency.value;
+        switch (frequency.type) {
+            case 'chord':
+                this.chord = frequency.value;
+                this.chordName = frequency.name;
+                break;
+            case 'drum':
+                if (frequency.value === 'kick') {
+                    this.playKick();
+                } else if (frequency.value === 'snare') {
+                    this.playSnare();
+                } else if (frequency.value === 'hiHat') {
+                    this.playHiHat();
+                }
+                break;
+            case 'melody': 
+                const existingOscillator = this.oscillators
+                    .find((oscillator) => oscillator.freq === frequency.value);
+                
+                if (!existingOscillator){
+                    this.playMelody(frequency.value);
+                }
+                break;
         }
     },
 
@@ -211,29 +235,19 @@ export default {
 
 <style scoped lang="scss">
 
-// h1 {
-//   margin: 40px 0 0;
-//   font-size: 90px;
-//   letter-spacing: 2px;
-//   text-shadow: 0 12px 20px rgba(20,18,21,.2);
-// }
-
-// h2 {
-//   font-size: 40px;
-//   letter-spacing: 1px;
-// }
-
-// img {
-//   width: 800px;
-//   max-width: 100%;
-//   opacity: .1;
-// }
-
 .container {
     margin-bottom: 30px;
 }
 
-a{
+.icon {
+    margin-right: 20px;
+}
+
+.field {
+    margin-bottom: 10px;
+}
+
+.footer-link {
     display: block;
     margin: 20px;
     text-align: center;
@@ -241,4 +255,12 @@ a{
     text-shadow: 0 12px 20px rgba(20,18,21,.2);
 }
 
+.message {
+    position: fixed;
+    top: 10%;
+    right: 50px;
+    z-index: 9999;
+    display: flex;
+    align-items: flex-end;
+}
 </style>

@@ -82,36 +82,43 @@ export const frequencies = [
     {
         type: 'chord',
         key: 'z',
+        name: 'C',
         value: [65, 82, 98]
     },
     {
         type: 'chord',
         key: 'x',
+        name: 'D',
         value: [73, 87, 110]
     },
     {
         type: 'chord',
         key: 'c',
+        name: 'E',
         value: [82, 98, 123]
     },
     {
         type: 'chord',
         key: 'v',
+        name: 'F',
         value: [87, 110, 131]
     },
     {
         type: 'chord',
         key: 'b',
+        name: 'G',
         value: [98, 123, 146]
     },
     {
         type: 'chord',
         key: 'n',
+        name: 'A',
         value: [110, 130, 165]
     },
     {
         type: 'chord',
         key: 'm',
+        name: 'H',
         value: [123, 146, 174]
     },
 ];
