@@ -1,9 +1,9 @@
 # disco8
 
 ## DEMO
-```
-[https://induweb.github.io/8-Disco/dist/]
-```
+
+Play some music! [https://induweb.github.io/8-Disco/dist/](https://induweb.github.io/8-Disco/dist/).
+
 ## Info
 ```
 This project presents the power of Web Audio API. No sound files, just a few oscillators. 
